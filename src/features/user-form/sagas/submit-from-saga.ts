@@ -1,8 +1,7 @@
-import { takeEvery, call, put } from 'redux-saga/effects';
-import { submitFormSuccess, submitFormFailure } from './actions';
-import { SUBMIT_FORM_REQUEST } from './actionTypes';
+import {ISubmission} from "../../../types.ts";
+import {call, put} from "redux-saga/effects";
 import {toast} from "react-toastify";
-import {type ISubmission} from "../types.ts";
+import {actions} from "../slice.ts";
 
 const mockApiCall = (input:ISubmission ) => {
     console.log('input' , input)
@@ -18,24 +17,20 @@ const mockApiCall = (input:ISubmission ) => {
 };
 
 
-function* submitFormSaga(action: any) {
+export function* submitFormSaga(action: any) {
     try {
-        console.log('Starting mocked API call with input:', action.payload);
-
         // @ts-ignore
         const response = yield call(mockApiCall, action.payload);
-        console.log('action.payload' , action.payload)
+
         toast.success('Form submitted successfully!');
 
-        yield put(submitFormSuccess(action.payload));
+        yield put(
+            actions.SUBMIT_FORM_SUCCESS(action.payload)
+        );
 
     } catch (error) {
         console.error('Error:', error);
         toast.error('Something went wrong! Please try again.');
-        yield put(submitFormFailure('Something went wrong! Please try again.'));
+        yield put(actions.SUBMIT_FORM_FAILURE('Something went wrong! Please try again.'));
     }
-}
-
-export function* watchSubmitForm() {
-    yield takeEvery(SUBMIT_FORM_REQUEST, submitFormSaga);
 }

@@ -2,17 +2,23 @@ import React from "react";
 import { Box, Input, Button, Text, Spinner } from "theme-ui";
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
-import { submitFormRequest } from '../store/actions.ts';
+import DOMPurify from 'dompurify';
+import {actions} from "../features/user-form";
+import {ISubmission} from "../types.ts";
 
 const InputForm: React.FC = () => {
     const dispatch = useDispatch();
-    const {  loading } = useSelector((state: any) => state);
+    const { loading } = useSelector((state: any) => state);
     const { register, handleSubmit, formState: { errors }, trigger } = useForm({
-        mode: 'onChange',
+        mode: 'onBlur',
     });
 
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
-        dispatch(submitFormRequest(data));
+        console.log('data.message' , data.message)
+        const sanitizedMessage = DOMPurify.sanitize(data.message);
+        console.log('after data.message' , data.message)
+        // dispatch(submitFormRequest({ ...data, message: sanitizedMessage }));
+        dispatch(actions.SUBMIT_FORM_REQUEST({...data, message: sanitizedMessage } as ISubmission));
     };
 
     return (
@@ -83,7 +89,6 @@ const InputForm: React.FC = () => {
                     </Button>
                 )}
             </form>
-
         </Box>
     );
 };
